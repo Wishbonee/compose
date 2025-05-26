@@ -1,3 +1,3 @@
-# Easypanel Compose
+# Supabase
 
 update
