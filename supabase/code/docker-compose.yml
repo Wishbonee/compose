@@ -8,7 +8,6 @@
 name: supabase
 
 services:
-
   studio:
     image: supabase/studio:2025.05.19-sha-3487831
     restart: unless-stopped
@@ -451,8 +450,9 @@ services:
         condition: service_healthy
       analytics:
         condition: service_healthy
+      ports:
+        - "6543:6543"
     environment:
-      PORT: 4000
       POSTGRES_PORT: ${POSTGRES_PORT}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -470,11 +470,46 @@ services:
       POOLER_POOL_MODE: transaction
     command:
       [
-        "/bin/sh",
-        "-c",
-        "/app/bin/migrate && /app/bin/supavisor eval \"$$(cat
-          /etc/pooler/pooler.exs)\" && /app/bin/server"
+        "CMD",
+        "curl",
+        "-sSfL",
+        "--head",
+        "-o",
+        "/dev/null",
+        "http://127.0.0.1:4000/api/health"
       ]
+    interval: 10s
+    timeout: 5s
+    retries: 5
+  depends_on:
+    db:
+      condition: service_healthy
+    analytics:
+      condition: service_healthy
+  ports:
+    - "6543:6543"
+  environment:
+    POSTGRES_PORT: ${POSTGRES_PORT}
+    POSTGRES_DB: ${POSTGRES_DB}
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    DATABASE_URL: ecto://supabase_admin:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/_supabase
+    CLUSTER_POSTGRES: true
+    SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+    VAULT_ENC_KEY: ${VAULT_ENC_KEY}
+    API_JWT_SECRET: ${JWT_SECRET}
+    METRICS_JWT_SECRET: ${JWT_SECRET}
+    REGION: local
+    ERL_AFLAGS: -proto_dist inet_tcp
+    POOLER_TENANT_ID: ${POOLER_TENANT_ID}
+    POOLER_DEFAULT_POOL_SIZE: ${POOLER_DEFAULT_POOL_SIZE}
+    POOLER_MAX_CLIENT_CONN: ${POOLER_MAX_CLIENT_CONN}
+    POOLER_POOL_MODE: transaction
+  command:
+    [
+      "/bin/sh",
+      "-c",
+      "/app/bin/migrate && /app/bin/supavisor eval \"$$(cat /etc/pooler/pooler.exs)\" && /app/bin/server"
+    ]
 
 volumes:
   db-config:
