@@ -81,6 +81,18 @@ async function searchReplace(path, search, replace) {
   await fs.promises.writeFile(path, newFile);
 }
 
+async function removeDir(path) {
+  console.log(`Removing directory ${path}`);
+
+  await execa("rm", ["-rf", path]);
+}
+
+async function renameDir(src, dest) {
+  console.log(`Renaming directory ${src} to ${dest}`);
+
+  await execa("mv", [src, dest]);
+}
+
 export default {
   cloneOrPullRepo,
   removeContainerNames,
@@ -89,4 +101,6 @@ export default {
   downloadFile,
   renameFile,
   searchReplace,
+  removeDir,
+  renameDir,
 };
