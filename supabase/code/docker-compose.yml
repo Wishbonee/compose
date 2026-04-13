@@ -9,6 +9,13 @@ name: supabase
 
 services:
 
+  supavisor:
+    image: supabase/supavisor:2.5.1
+    restart: unless-stopped
+    ports:
+      - "15432:5432"
+      - "16543:6543"
+
   studio:
     image: supabase/studio:2025.05.19-sha-3487831
     restart: unless-stopped
