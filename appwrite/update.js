@@ -1,11 +1,11 @@
 import utils from "../utils.js";
 
 await utils.downloadFile(
-  "https://raw.githubusercontent.com/appwrite/appwrite/main/docker-compose.yml",
+  "https://appwrite.io/install/compose",
   "./code/docker-compose.yml"
 );
 await utils.downloadFile(
-  "https://raw.githubusercontent.com/appwrite/appwrite/main/.env",
+  "https://appwrite.io/install/env",
   "./code/.env.example"
 );
 
@@ -14,6 +14,6 @@ await utils.removePorts("./code/docker-compose.yml");
 
 await utils.searchReplace(
   "./code/.env.example",
-  "_APP_DOMAIN=appwrite.test",
+  "_APP_DOMAIN=localhost",
   "_APP_DOMAIN=$(PRIMARY_DOMAIN)"
 );
